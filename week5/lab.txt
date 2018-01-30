@@ -1,0 +1,156 @@
+Lab 5: 
+For this lab, we had to implement the tr command as
+in linux. The theory behind this lab was that
+tr implemented with buffer would be faster/ more 
+efficient than tr implemented with system call.
+
+I wrote two programs tr2b and tr2u to test.
+
+P/S:
+For the read and write function, since we were comparing 
+to getchar and putchar, we had to create a buffer of size 
+one to act as an storage, and read/ write one 
+byte at a time.
+
+1. gcc -o tr2b tr2b.c
+./tr2b 'abc' 'xyz' <in.txt
+
+Here was the in.txt: 
+
+This is a test file
+I will try to z
+impedamce as possbile
+xyz are correct
+
+Here was the output on the screen:
+
+This is x test file
+I will try to z 
+impedxmze xs possyile
+xyz xre zorrezt
+
+
+2.
+ gcc -o tr2u tr2u.c
+./tr2u 'abc' 'xyz' <in.txt
+
+Here was the in.txt: 
+
+This is a test file
+I will try to z
+impedamce as possbile
+xyz are correct
+
+Here was the output on the screen:
+
+This is x test file
+I will try to z 
+impedxmze xs possyile
+xyz xre zorrezt
+
+3. To create a big file with 5,000,000 bytes
+$head --bytes=5000000 /dev/urandom >output.txt
+
+a. when copy one file to another
+***buffered
+$ strace -c ./tr2b 'abc' 'xyz' <output.txt >output_large_b.txt
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 63.59    0.003381           3      1221           write
+ 31.71    0.001686           1      1223           read
+  1.69    0.000090          10         9           mmap
+  0.92    0.000049          12         4           mprotect
+  0.75    0.000040          20         2           open
+  0.53    0.000028           7         4           fstat
+  0.43    0.000023          23         1           munmap
+  0.24    0.000013           7         2           close
+  0.13    0.000007           7         1           arch_prctl
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.005317                  2470         1 total
+
+
+
+*** Unbuffered
+$ strace -c ./tr2u 'abc' 'xyz' <output.txt >output_large_u.txt
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 53.86   39.257569           8   5000000           write
+ 46.13   33.623983           7   5000002           read
+  0.00    0.000076          11         7           mmap
+  0.00    0.000052          13         4           mprotect
+  0.00    0.000026          13         2           open
+  0.00    0.000022          22         1           munmap
+  0.00    0.000013           7         2           fstat
+  0.00    0.000013          13         1         1 access
+  0.00    0.000013          13         1           execve
+  0.00    0.000012           6         2           close
+  0.00    0.000009           9         1           brk
+  0.00    0.000006           6         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00   72.881794              10000024         1 total
+
+Buffer tr2b had more advantage in terms of perfomance, the call only about 2500, where as
+the unbuffered was about 10 millions calls
+b. Copy to the terminal
+***buffered
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 96.02    0.225278         11     20023           write
+ 3.86     0.009062         7       1223           read
+  0.04    0.000091         10         9           mmap
+  0.02    0.000049         12         4           mprotect
+  0.01    0.000028          7         4           open
+  0.01    0.000027         14         2           fstat
+  0.01    0.000023         23         1           munmap
+  0.01    0.000012         13         1           close
+  0.01    0.000012         06         2           arch_prctl
+  0.01    0.000012         12         1           brk
+  0.00    0.000009          9         1         1 access
+  0.00    0.000007          7         1           execve
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.005395                  21272         1 total
+
+***Unbufferd
+$ strace -c ./tr2u 'abc' 'xyz' <output.txt
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 53.64   38.478617           8   5000000           write
+ 46.36   33.254894           7   5000002           read
+  0.00    0.000078          11         7           mmap
+  0.00    0.000050          13         4           mprotect
+  0.00    0.000027          13         2           open
+  0.00    0.000022          22         1           munmap
+  0.00    0.000013           7         2           fstat
+  0.00    0.000013          13         1         1 access
+  0.00    0.000013          13         1           execve
+  0.00    0.000012           6         2           close
+  0.00    0.000009           8         1           brk
+  0.00    0.000006           6         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00   71.733754              10000024         1 total
+
+In this time, the unbuffred has the same amount of system calls, but the tr2b had much more calls was because tr2b now had to output to the terminal sreen.
+This process was similar to unbuffered write, therefore, it caused much more time. The tr2u did not get affect because
+write to the terminal was the same as write to a file.
+4.
+
+***Buffered:
+$ time ./tr2b 'abc' 'xyz' < output.txt >output_large_b
+
+real	0m0.165s
+user	0m0.155s
+sys	0m0.008s
+
+***Unbuffered
+$ time ./tr2u 'abc' 'xyz' < output.txt >output_large_u
+
+real	0m5.347s
+user	0m0.192s
+sys	0m5.151s
+

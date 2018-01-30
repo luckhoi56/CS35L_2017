@@ -1,0 +1,24 @@
+<tr> <td> EnglishWord </td> <td>Hword</td> contains Hawaiian word in Hword position
+Treat upper case letter as lower case
+<u>a</u> ingore <u> or </u>
+treat ` as '
+
+
+--ignore-case
+
+
+1. find any line that has <td> </td> using: grep "<td>.*</td>"
+2. remove any line with <td></td>
+ 
+3. remove odd number of line : awk 'NR%2==0' 
+
+
+2nd: remove all lines that dont contain Hawaiian characters
+3.remove all lines with <td></td>: grep -v "<td></td>"  
+4.
+grep "<td>.*</td>" hwnwdseng.htm | grep -v "<td></td>" | awk 'NR%2==0'| sed  "s/<u>//g; s/<\/u>//g; s/<td>//g; s/\`/'/g; s/<\/td>//g" | tr '[:upper:]' '[:lower:]' 
+
+
+
+s/<u>//g
+s/<\/u>//g

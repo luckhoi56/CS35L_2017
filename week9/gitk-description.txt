@@ -1,0 +1,14 @@
+The top left showed the repository trees such as the branches,
+commits and merges.
+It also gives information about branches
+
+The middle window showed who did the 
+change/ commit
+
+The right window showed the date of the commit
+
+The lower half left of the window showed the
+change log comment
+
+The lower half right showed what files
+got impacted

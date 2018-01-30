@@ -1,0 +1,99 @@
+Assignment 3: Modifying and rewriting software
+Laboratory: Installing a small change to a big package
+
+First I logged into the Seasnet Server
+Then I downloadeded the assign3.html using:
+1.wget http://web.cs.ucla.edu/classes/fall17/cs35L/assign/assign3.html
+Get the copy of assign3
+
+Next, I had to extract the url from the assign3.html,
+which I used
+2. vim assign3.html
+Go into the html and extract the url
+3. / Grab
+
+Then I had to download the Coureutils 7.6,
+which I used:
+4. Copy the link then wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+
+Next I used tar -xvfz  coreutils-7.6.tar.gz to untar the 
+tar file
+
+
+5. Go into the directory of the file 
+cd /u/ee/ugrad/khoil/CS35L/Lab03/coreutils-7.6
+
+6. ./configure --prefix=$HOME/CS35L/Lab03/unfixed
+7. make 
+8. make install
+
+#Reproduce the bug
+9. cd $HOME/CS35L/Lab03/unfixed
+10. cd bin
+11. ./ls -l /bin/bash
+Bug was found
+-rwxr-xr-x 1 root root 942200 2017-02-15 04:37 /bin/bash
+
+
+
+To fix the bug, I went back to the path ~/CS35L/Lab03/coreutils-7.6/src
+To patch the file, I had to create a file, called patch using vim patch
+and paste the portion of the patch into the file
+
+diff --git a/src/ls.c b/src/ls.c
+index 1bb6873..4531b94 100644
+--- a/src/ls.c
++++ b/src/ls.c
+@@ -2014,7 +2014,6 @@ decode_switches (int argc, char **argv)
+             break;
+ 
+           case long_iso_time_style:
+-          case_long_iso_time_style:
+             long_time_format[0] = long_time_format[1] = "%Y-%m-%d %H:%M";
+             break;
+ 
+@@ -2030,13 +2029,8 @@ decode_switches (int argc, char **argv)
+                    formats.  If not, fall back on long-iso format.  */
+                 int i;
+                 for (i = 0; i < 2; i++)
+-                  {
+-                    char const *locale_format =
+-                      dcgettext (NULL, long_time_format[i], LC_TIME);
+-                    if (locale_format == long_time_format[i])
+-                      goto case_long_iso_time_style;
+-                    long_time_format[i] = locale_format;
+-                  }
++                  long_time_format[i] =
++                    dcgettext (NULL, long_time_format[i], LC_TIME);
+               }
+           }
+       /* Note we leave %5b etc. alone so user widths/flags are honored.  */
+
+
+After that, I use 
+12. patch ls.c <patch
+To check if the was patched successfully, I had to re-compile the src
+13. cd .. (note that I was in /u/ee/ugrad/khoil/CS35L/Lab03/coreutils-7.6)
+
+14. ./configure --prefix=$HOME/CS35L/Lab03/fixed
+15.make
+16. make install
+
+I cd back to the path $HOME/CS35L/Lab03/fixed/bin and typed ./ls -l /bin/bash
+
+-rwxr-xr-x 1 root root 942200 Feb 15  2017 /bin/bash
+
+The bug was fixed !
+Went back to the src folder, I created two files, similarly 
+in buggy ls and fixed ls. Here were the results:
+18. touch -t 1504152240 oldDate( this meant 
+created a file with time stamp 2015 April 15 at 22:40)
+Here was the output in the fixed folder:
+-rw-r--r-- 1 khoil eeugrad      0 Apr 15  2015 oldDate
+-rw-r--r-- 1 khoil eeugrad      0 Oct 21 14:00 newDate
+
+whereas, in buggy folder:
+-rw-r--r-- 1 khoil eeugrad      0 2015-04-15 22:40 olDate
+-rw-r--r-- 1 khoil eeugrad      0 2017-10-21 14:03 newDate
+
+

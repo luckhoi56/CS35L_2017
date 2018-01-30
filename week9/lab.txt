@@ -1,0 +1,158 @@
+Assignment 9: Change Management
+
+I. Laboraroty: managing a backported change
+
+1. get copy of the Diffutils from the main
+website
+
+$git clone https://git.savannah.gnu.org/git/diffutils.git
+
+$cd diffutils
+
+2. create log of changes
+git log > git-log.txt
+
+3. generate a list of tags
+
+
+4. Find the commit,
+generate a patch for that commit
+
+Use vim to open the git-log.txt
+and search for "maint: quote 'like this' 
+or "like this", not `like this"
+$vim git-log.txt
+/maint: quote 'like this' or "like this", not `like this
+
+$git show 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f > quote-patch.txt
+
+5.check out 3.0 version
+I checkout into my own branch
+$git checkout -b '2017_3.0' 'v3.0'
+
+6. Apply patch
+patch -p1 <quote-patch.txt
+
+b. Problems:
+Hunk #1 FAILED at 29.
+
+1 out of 1 hunk FAILED -- saving rejects to file cfg.mk.rej
+patching file doc/diagmeet.note
+can't find file to patch at input line 222
+
+patching file README
+Hunk #1 FAILED at 9.
+Hunk #3 FAILED at 60.
+2 out of 3 hunks FAILED -- saving rejects to file README.rej
+
+7. $git status
+
+On branch 2017_3.0
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   NEWS
+        modified:   README
+        modified:   TODO
+        modified:   doc/diagmeet.note
+        modified:   ms/config.bat
+        modified:   ms/config.site
+        modified:   po/en.po
+        modified:   src/analyze.c
+        modified:   src/cmp.c
+        modified:   src/context.c
+        modified:   src/diff.c
+        modified:   src/diff.h
+        modified:   src/diff3.c
+        modified:   src/dir.c
+        modified:   src/ifdef.c
+        modified:   src/io.c
+        modified:   src/sdiff.c
+        modified:   src/side.c
+        modified:   src/system.h
+        modified:   src/util.c
+        modified:   tests/help-version
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        NEWS.orig
+        README-hacking.orig
+        README-hacking.rej
+        README.orig
+        README.rej
+        cfg.mk.orig
+        cfg.mk.rej
+        git-log.txt
+        git-tags.txt
+        ms/config.site.orig
+        quote-patch.txt
+        src/cmp.c.orig
+        src/context.c.orig
+        src/diff.c.orig
+        src/diff.c.rej
+        src/diff.h.orig
+        src/diff3.c.orig
+        src/diff3.c.rej
+        src/dir.c.orig
+        src/sdiff.c.orig
+        src/system.h.orig
+        src/util.c.orig
+        tests/help-version.orig
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+8. vc-revert:
+revert the work file in the current VC
+fileset to the last revision
+diff mode :major mode used the output
+(known as a patch)
+vc-diff: compare the work
+files in the current VC fileset with the version you 
+started from (vc-diff)
+
+9.For non .c extension file,
+we only opened them using vc-diff (C-x v =) and 
+then apply the vc-revert (C-x v u)
+Enter yes
+then C-x C-c to quit
+
+-emacs NEWS 
+-emacs README
+-emacs TODO
+emacs doc/diagmeet.note;
+emacs ms/config.bat; 
+emacs ms/config.site; 
+emacs po/en.po;
+emacs src/diff.h; 
+emacs src/system.h; 
+emacs tests/help-version
+
+b. I then ran the following command to revert any changes
+to comment hunks
+emacs src/analyze.c
+emacs src/cmp.c
+emacs src/context.c
+emacs src/diff.c   
+emacs src/diff3.c
+emacs src/dir.c
+emacs src/ifdef.c
+emacs src/io.c
+emacs src/sdiff.c
+emacs src/side.c
+emacs src/util.c
+
+
+Within each emacs, I used 
+vc-diff (C-x v =) to get
+the diff buffer, and then revert them
+using C-u C-c C-a. I then exited
+emacs with C-x C-c, yes, saved and quit
+
+
+
+For all .c extension file, we
+had to go through the 
+
+10. 

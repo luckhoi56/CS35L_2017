@@ -1,0 +1,236 @@
+Week 4: C programming and debugging
+
+I. Labratory: Debugging a C Program
+First I dowloaded the assignment website,
+using:
+1. $ wget http://web.cs.ucla.edu/classes/fall17/cs35L/assign/assign4.html
+
+Next i had to vim into the file
+and extracte the URL:
+2. $ wget http://web.cs.ucla.edu/classes/fall17/cs35L/assign/coreutils-with-bug.tar.gz
+
+3. $ tar -xvzf coreutils-with-bug.tar.gz
+
+4. $ cd coreutils-with-bug.tar.gz
+
+5. $ ./configure
+6. $ make
+
+After a few minutes of waiting, it reported that 
+there were a few errors:
+In file included from utimecmp.c:41:
+utimens.h:2: error: conflicting types for 'futimens'
+/usr/include/sys/stat.h:374: note: previous declaration of 'futimens' was here
+make[3]: *** [utimecmp.o] Error 1
+make[3]: Leaving directory `/w/home.12/ee/ugrad/khoil/CS35L/week4/coreutils-with-bug/lib'
+make[2]: *** [all] Error 2
+make[2]: Leaving directory `/w/home.12/ee/ugrad/khoil/CS35L/week4/coreutils-with-bug/lib'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/w/home.12/ee/ugrad/khoil/CS35L/week4/coreutils-with-bug'
+make: *** [all] Error 2
+
+By reading the debug's comments, I believed that
+the error was due to multiple declaractions of 
+'futimens'
+
+I downloaded the patch from the website:
+7. $ wget http://web.cs.ucla.edu/classes/fall17/cs35L/assign/coreutils.diff
+
+8. $ cd coreutils-with-bug
+9. $ patch -p0 <coreutils.diff
+Here was the output when I applied the patch:
+patching file lib/utimens.c
+patching file lib/utimens.h
+patching file src/copy.c
+patching file src/tee.c
+patching file src/touch.c
+
+The Patch fixed the problem by changing the name
+from 'futimens' to 'coreutils _futimens"
+and from 'tee' to 'coreutils_tee'
+Next thing, I had to to make
+the program again
+
+$ make ENTER
+
+
+Next I ran the following commands:
+$ tmp=$(mktemp -d)
+$ cd $tmp
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+$ touch now
+$ sleep 1
+$ touch now1
+$ TZ=UTC0 /u/ee/ugrad/khoil/CS35L/week4/coreutils-with-bug/src/ls  -lt --full-time wwi-armistice now now1
+$ cd
+$ rm -fr $tmp
+
+I received the following output:
+-rw-r--r-- 1 khoil eeugrad 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 khoil eeugrad 0 2017-10-24 17:01:47.078023051 +0000 now1
+-rw-r--r-- 1 khoil eeugrad 0 2017-10-24 17:01:46.075977537 +0000 now
+
+The bug was re-produced
+
+Before I debugged the ls file, I made a separate copy of ls
+into my current working directory:
+$ cp /u/ee/ugrad/khoil/CS35L/week4/coreutils-with-bug/src/ls .
+Next I ran the gdb:
+$gdb ./ls
+$run
+
+"Program exited normally"
+
+To find all the functions in the proigram, I typed
+$ info functions
+and here was the output:
+File ls.c:
+int main(int, char **);
+void usage(int);
+static size_t calculate_columns(_Bool);
+static void clear_files(void);
+static int compare_atime(V, V);
+static int compare_ctime(V, V);
+static int compare_extension(V, V);
+static int compare_mtime(V, V);
+static int compare_name(V, V);
+static int compare_size(V, V);
+static int compare_version(V, V);
+static int compstr_atime(V, V);
+static int compstr_ctime(V, V);
+static int compstr_extension(V, V);
+static int compstr_mtime(V, V);
+static int compstr_name(V, V);
+static int compstr_size(V, V);
+static _Bool dev_ino_compare(const void *, const void *);
+static void dev_ino_free(void *);
+s
+atic size_t dev_ino_hash(const void *, size_t);
+static void dired_dump_obstack(const char *, struct obstack *);
+static void extract_dirs_from_files(const char *, _Bool);
+
+The problems involved the time and the sorting based on the time,
+so I narrowed down to the following functions:
+static int compare_atime(V, V);
+static int compare_ctime(V, V);
+static int compare_mtime(V, V);
+static int compstr_atime(V, V);
+static int compstr_ctime(V, V);
+static int compstr_mtime(V, V);
+
+(gbd) list
+static int rev_cmp_mtime(V, V);
+static int rev_str_atime(V, V);
+static int rev_str_ctime(V, V);
+static int rev_str_mtime(V, V);
+static void sort_files(void);
+
+Since the ls files sorted the file in incorrect order,
+my first intuition was to set the break point at 
+sort_files:
+(gdb) b sort_files
+(gdb) run
+(gdb) list
+
+The sort_files invoked:
+func = sort_reverse ? rev_cmp_mtime : compare_mtime;
+
+(gdb) list static int rev_cmp_mtime (V a, V b) { return compare_mtime (b, a); }
+(gdb) list compare_mtime)
+
+compare_mtime invoked cmp_mtime
+I observed that cmp_mtime was the foundation of
+most of the time functions, here was the source code:
+
+static inline int
+cmp_mtime (struct fileinfo const *a, struct fileinfo const *b,
+           int (*cmp) (char const *, char const *))
+{
+  int diff = timespec_cmp (get_stat_mtime (&b->stat),
+                           get_stat_mtime (&a->stat));
+  return diff ? diff : cmp (a->name, b->name);
+}
+
+(gdb) list
+Next I looked at the function timespec_cmp
+
+(gdb) list timespec_cmp
+list timespec_cmp
+43  /* Return negative, zero, positive if A < B, A == B, A > B, respectively.
+44     Assume the nanosecond components are in range, or close to it.  */
+45  static inline int
+46  timespec_cmp (struct timespec a, struct timespec b)
+47  {
+48    int diff = a.tv_sec - b.tv_sec;
+49    return diff ? diff : a.tv_nsec - b.tv_nsec;
+50  }
+51  
+
+The variable diff is from the difference of 
+a.tv_sec and b.tv_sec. Because they are in seconds, 
+we created a file 1918, that would be 2017 -1918 =99 years, converted 
+that to second : 3,122,064,000
+
+In fact, here were the result from the gdb:
+
+(gdb) break compare_mtime
+timespec_cmp (b=..., a=...) at ../lib/timespec.h:48
+imespec_cmp (b=..., a=...) at ../lib/timespec.h:48
+48    int diff = a.tv_sec - b.tv_sec;
+(gdb) watch diff
+Watchpoint 7: diff
+(gdb) s
+Watchpoint 7: diff
+
+Old value = 3
+New value = 1509087676
+timespec_cmp (b=..., a=...) at ../lib/timespec.h:49
+49    return diff ? diff : a.tv_nsec - b.tv_nsec;
+(gdb) s
+Watchpoint 7: diff
+
+Old value = 1509087676
+New value = -1172053620
+
+We could see that there were overflow happened in diff 
+variable.
+
+To fix this, we had to go to timespec.h,
+which located at /coreutils-with-bug/lib
+using this commands:
+find ~/CS35L/week04/coreutils-with-bug/lib
+
+Since we sorted files based on the positive, negative, or equal,
+we can just return 0,1,-1 from the timespec_cmp.
+
+timespec_cmp (struct timespec a, struct timespec b)
+{
+  if (a.tv_sec >b.tv_sec)
+        return 1;
+if (a.tv_sec < b.tv_sec)
+return -1;
+else
+return 0;
+}
+
+To create the patch file, I did 
+diff -u ~/coreutils-with-bug/lib/timespec.h timespec.h >lab4.diff
+
+
+/*Test with Linux Server */
+To test with the Linux server, I typed:
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+$ touch now
+$ sleep 1
+$ touch now1
+$ TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+
+Here was the output:
+-rw-r--r-- 1 khoil eeugrad 0 2054-12-17 17:28:16.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 khoil eeugrad 0 2017-10-27 11:34:14.792372000 +0000 now1
+-rw-r--r-- 1 khoil eeugrad 0 2017-10-27 11:34:06.368577000 +0000 now
+
+The Seasnet treated the old file as the 
+file in the future, this is because Seasnet NFS 
+filesystem 32 bit time stamp, but the 
+local file on Linux system has 64 bit time stamp

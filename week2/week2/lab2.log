@@ -1,0 +1,61 @@
+Lab 2 : Shell scripting
+
+Part 1: 
+
+Before I did anything else, I used locale to get data from the LC_*environment
+
+locale Enter
+
+All LC_* were in US.UTF-8  so I had to type:
+
+export LC_ALL='C'
+
+to make sure locale outputs the right things. I did locale command again, and now
+the outout were all "C"
+
+To sort the file in /usr/share/dict/words and copied it into my directory, I used:
+
+sort /usr/share/dict/words > ~/CS35L/Lab02
+
+To take a copy of the assign2.html, used the following command:
+
+wget http://web.cs.ucla.edu/classes/fall17/cs35L/assign/assign2.html Enter
+
+*Command:
+tr -c 'A-Za-z' [\n*]' <assign2.html
+Explain: The code says that to replace the complement in the range of A-Z and a-z with the new
+line character. Basically any character not belongs to A-Z or a-z will be replaced with new line character
+
+*Command:
+tr -cs 'A-Za-z' '[\n*]'
+Explain: This code is almost the same as the previous as the other one, but the extra s in -cs will make the 
+file slightly different. For instance, if the file previously had multiples of new line character
+because of the complement, now it only does new line one time, not repeating it.
+
+
+*Command:
+tr -cs 'A-Za-z' '[\n*]' | sort <assign2.html
+Explain: This command is almost the same as previous one, but with sort command the 
+output will be sorted lexicographically according to ASCII code ( due to C locale)
+
+*Command:
+tr -cs 'A-Za-z' '[\n*]' | sort -u <assign2.html
+Explain: This command with -u will remove the duplicate, so we could not
+see multiple new lines as the previous command
+
+*Command:
+tr -cs 'A-Za-z' '[\n*]' <assign2.html | sort -u | comm - words 
+Explain: This command after sorting the assign2, it will compare with the words file
+. There were three columns. The first column responded to the unique non-duplicate words with new 
+line character of assign2.html, the second column is the unique words of words file. The third 
+column was the common characters of both file
+
+*Command:
+tr -cs 'A-Za-z' '[\n*]'  <assign2.html | sort -u | comm -23 - words 
+Explain: This command was almost the same as the previous command. The -23
+means to suppress the column 2 and 3 of comm command, so we only care for the first
+column now
+
+
+Next I used wget http://mauimapp.com/moolelo/hwnwdseng.htm Enter 
+to get the copy of the web page

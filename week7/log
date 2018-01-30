@@ -1,0 +1,116 @@
+Assignment  SSH
+
+Lab:
+1. Set up the beagle board:
+
+First I had to connect the beagle board into my PC, 
+disabled the signature requirement and installed the driver. 
+After that I setup the wifi connection
+Since the beagle board did not have the 
+xterm, gedit, and firefox
+
+$sudo apt-get install xterm
+$sudo apt-get install gedit
+$sudo apt-get install firefox
+$sudo apt-get install xauth
+$sudo connmanctl
+
+>scan wifi
+>services
+
+>connect CSD-Guest wifi_506583d4fc5e_544e434150413937414239_managed_psk
+
+
+>agent on
+
+Enter the password
+
+>quit
+
+
+THen I had to update the database of apt-get by typing:
+
+$sudo apt-get update
+
+$sudo apt-get install xauth
+
+$apt-get install firefox-esr-l10n-en-gb
+
+
+
+
+Part 2: SSHed
+My partner was Lisan (server)
+
+--Server
+$ssh-keygen
+
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/luckhoi56/.ssh/id_rsa):
+
+After entered passphrase, I expected some random image
+
+Then Lisan created an account for the client, using the command:
+$sudo useradd -d /home/user1 -m user1 
+$sudo passwd user1
+
+Enter password for user1
+
+
+//Create .ssh for user1
+$cd /home/user1
+$sudo mkdir .ssh
+
+//change the ownership and permission on .ssh directory
+//-R means operate on files and directories recursively
+$sudo chown -R user1 .ssh
+$sudo chmod 700 .ssh
+
+Used ifconfig to check for the server IP
+$ifconfig
+
+
+
+//Optional: to disable the password-based authentication
+$vim /etc/ssh/sshd_config
+Looked for PasswordAuthentication and set to "no"
+
+
+---On the client side 
+
+$ssh-keygen
+
+//Copy the public key and transfer that to the server
+// so the server can use that to encrypt the message
+// and send it back to the client
+$ssh-copy-id -i user1@192.168.1.15
+This command copied the public key of client and
+sent it to the server side
+
+// To setup the key-based manager
+To invoke agent:
+$eval `ssh-agent`
+
+$ssh-add
+Identity added: /home/luckhoi56/.ssh/id_rsa (/home/luckhoi56/.ssh/id_rsa)
+
+SSH to server:
+$ssh user1@192.168.1.15
+
+I now did not have to enter the password
+
+
+
+Then, SSHed and used with -X option
+Note:
+For this part, I used  Xmanager and forwarded to Xshell,
+I also set Tunneling to Xmanager
+
+$ssh -X user1@192.168.1.15
+
+$xterm
+A white xterm shell showed up
+$firefox
+firefox browser showed up
+$gedit
+A text editor showed up

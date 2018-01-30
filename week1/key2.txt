@@ -1,0 +1,30 @@
+EX 1.5:
+1. emacs ENTER
+M-x
+mkdir ENTER
+junk ENTER
+
+2a. C-x C-f junk/hello.c ENTER
+2b. Copy the source code and paste into the file
+
+3.M-x compile ENTER
+BACKSPACE BACKSPACE BACKSPACE BACKSPACE (delete the m-k)
+gcc -o hello-out hello.c ENTER
+
+4. gcc -o hello-out hello.c ENTER
+C-u M-! ./hello-out
+M-x append-to-file ENTER
+~/key1.txt 
+
+
+#include <stdio.h>
+int
+main (void)
+{
+  char n = '\n';
+  char b = '\\';
+  char q = '"';
+  char const *p = "#include <stdio.h>%cint%cmain (void)%c{%c  char n = '%cn';%c  char b = '%c%c';%c  char q = '%c';%c  char const *p = %c%s%c;%c  printf (p, n, n, n, n, b, n, b, b, n, q, n, q, p, q, n, n, n, n);%c  return 0;%c}%c";
+  printf (p, n, n, n, n, b, n, b, b, n, q, n, q, p, q, n, n, n, n);
+  return 0;
+}

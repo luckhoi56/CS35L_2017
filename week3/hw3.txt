@@ -1,0 +1,35 @@
+Q1:
+It is not necessaray to remove the line
+"case_long_iso_time_style"
+because in the patch the line
+go to case_long_iso_time_style
+has been deleted so case_long_iso_time_style
+will never be reached again
+Q2:
+There are some countries in the world, such 
+as China who prefers the other format. And 
+by using the traditional format, only the 
+English speaker can understand, thus causes
+confusion
+
+Q3: 
+If we run ./randline.py /dev/null. The error would be
+IndexError: list index out of range
+It is because the exception only catches
+numlines <0. randline.py assumes that 
+the file has at something in it. Therefore,
+when we will get index error when the file is empty
+
+Q4:
+alias python3=/usr/local/cs/bin/python3
+python3 randline.py empty
+I obtained the following error:
+ except IOError as (errno, strerror):
+                      ^
+SyntaxError: invalid syntax
+This is because Python3 no longer allow iteration
+over exception tuple  (errno, strerror)
+like Python2. To fix this, we can use
+
+except IOError as err:
+        errno, strerror = err.args

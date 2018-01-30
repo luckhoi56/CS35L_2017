@@ -1,0 +1,70 @@
+
+2. Checkout version 3.0 of Diffutils
+
+$git checkout -b quote v3.0
+
+3. Install change to a new branch
+$ patch -p1 < quote-3.0-patch.txt
+
+Here were the outputs:
+patching file src/cmp.c
+patching file src/diff.c
+patching file src/diff3.c
+patching file src/dir.c
+patching file src/sdiff.c
+patching file src/util.c
+
+4.5
+I then emacs into each file,
+and
+$ C-x 4 a for each one and
+put some change log comment
+
+6. Next I commited the change
+
+git commit -aF ChangeLog
+
+I commited changed to the new branch, using the ChangeLog entry as the
+commit message
+
+7.  $git format-patch -1 --stdout >formatted-patch.txt
+
+This command was to create the patch file
+
+8. I changed my patch with partner Phillip Liang
+
+I renamed his patch to partner-patch.txt
+
+$git checkout -b partner v3.0
+Checkout another branch for partner
+
+Next I used
+
+$git am partner-patch.txt
+
+Applying: 2017-12-04 Phillip Liang <philliang@lnxsrv03.seas.ucla.edu>
+
+Next, I ran 
+$./bootstrap
+./configure
+make
+
+Then I ran
+
+$./src/diff .-
+$./src/diff --help
+I did not show `, which means we were successful
+
+
+10. 
+$cd..
+
+I then clone into a folder
+
+$git clone ~/eggert/src/gnu/emacs gitrep
+
+$cd gitrep
+
+$gitk
+
+The newest merge point is 2017-11-02

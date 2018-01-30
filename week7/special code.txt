@@ -1,0 +1,1 @@
+gpg --verify <.sig file> <orignal non sig file>

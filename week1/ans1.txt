@@ -1,0 +1,167 @@
+1. man man
+man -k string
+man -k time
+Use man -k <key word> to such for all commands that contains that key
+words in their man page
+2.whereis cp
+cp is at cp: /bin/cp /usr/share/man/man1/cp.1.gz /usr/share/man/man1p/cp.1p.gz
+whereis wc
+wc is at wc: /usr/bin/wc /usr/share/man/man1/wc.1.gz /usr/share/man/man1p/wc.1p.gz
+
+
+
+3. Use man find
+find /usr/bin -name "?"
+I found three files w, X [
+whatis w, whatis X, whatis [
+w: show who is logged on and what they are doing
+X: a portable, network-transparent window system
+[: nothing appropriate
+
+
+
+
+4.
+cd /usr/bin
+readlink /usr/bin/emacs
+result /etc/alternative/emacs
+cd /etc/alternatives
+readlink emacs
+result: /usr/bin/emacs-23.1
+cd /usr/bin
+readlink emacs-23.1
+result: nothing
+Therefore, the emacs links to /usr/bin/emacs-23.1
+
+5.
+man chmod
+g-s set the groups ID on the current directory
+o-x: remove the executable permission for others 
+6.
+man find
+read through the pages and find the -mtime in the TEST section
+To search within 3 weeks -mtime -21
+
+7.find -mtime -21 -type d
+Under man find under TEST section. 
+
+
+.
+./Desktop
+./Documents
+./Downloads
+./Downloads/web.cs.ucla.edu
+./Downloads/web.cs.ucla.edu/classes
+./Downloads/web.cs.ucla.edu/classes/fall17
+./Downloads/web.cs.ucla.edu/classes/fall17/cs35L
+./Downloads/web.cs.ucla.edu/classes/fall17/cs35L/assign
+./WINDOWS
+./lab1
+./.vim
+./CS35L
+./.emacs.d
+./.emacs.d/auto-save-list
+./junk
+./Good File
+./ex1
+./new
+
+8.
+(man find)l      symbolic link; this is never true if the -L option or the -
+follow option is in effect, unless the symbolic link is broken.  If you want 
+to search for symbolic links when -L is in effect, use -xtype.
+
+whereis find
+cd /bin
+find -type l
+./dnsdomainname
+./rview
+./view
+./iptables-xml-1.4.7
+./gtar
+./awk
+./ex
+./sh
+./rvi
+./egrep
+./traceroute6
+./mail
+./iptables-xml
+./domainname
+./csh
+./nisdomainname
+./fgrep
+./ksh
+./ypdomainname
+./rnano
+
+There are 20 symbolic link in the same directory of find.
+
+9. man ls
+find -l (list in one line) and -t (sort by time modification)
+ls -l -t
+The oldest file is libICE.so.6.3.0 Nov 19 2009
+
+
+10. man locale
+locale gets it data by summarizing the current locale environment for each category
+defined by the LC_ *environment vairables
+
+11. 
+
+man emacs
+emacs
+C-h a sort Enter
+Buffer-menu-sort              M-x ... RET
+   Sort the buffer menu by COLUMN.
+Buffer-menu-sort-by-column    M-x ... RET
+   Sort the buffer menu by the column clicked on.
+ibuffer-invert-sorting        M-x ... RET
+   Toggle whether or not sorting is in reverse order.
+ibuffer-toggle-sorting-mode   M-x ... RET
+   Toggle the current sorting mode.
+rmail-sort-by-author          M-x ... RET
+   Sort messages of current Rmail buffer by author.
+rmail-sort-by-correspondent   M-x ... RET
+   Sort messages of current Rmail buffer by other correspondent.
+rmail-sort-by-date            M-x ... RET
+   Sort messages of current Rmail buffer by "Date" header.
+rmail-sort-by-labels          M-x ... RET
+   Sort messages of current Rmail buffer by labels.
+rmail-sort-by-lines           M-x ... RET
+   Sort messages of current Rmail buffer by the number of lines.
+rmail-sort-by-recipient       M-x ... RET
+   Sort messages of current Rmail buffer by recipient.
+rmail-sort-by-subject         M-x ... RET
+   Sort messages of current Rmail buffer by "Subject" header.
+
+12.
+Note: C-M-a = <ESC> C-a
+Use C-h k then type C-M-a: move backward to the beginning of a defun
+C-M-b: move backward one balanced expression
+C-M-c:Exit from the innermost recursive edit or minibuffer
+C-M-d:Move forward down one level of parentheses
+C-M-e:Move forward to next end of defun
+C-M-f: Move forward across one balanced expression (sexp)
+C-M-g: undefined
+C-M-h:Put mark at end of this defun, point at beginning.
+The defun marked is the one that contains point or follows point
+
+
+13.
+C-h k C-g: quit the current command in emacs
+
+14. 
+C-h f yank Enter
+Yank reinserts the stretch of killed text most recently killed (yanked)
+
+15. In one terminal:
+cd /usr/bin
+ls -l
+man ls
+
+In the second terminal: 
+emacs
+M-x dired Enter
+the difference is dired is the same as ls -lR (lists sub-directories in recursive way)
+whereas ls -l prints in long format

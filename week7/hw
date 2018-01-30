@@ -1,0 +1,32 @@
+Hw.txt
+1. Still Secured
+Even if the the other team had been observing all the bytes going across the network,
+they ddid not have the private key to decrypt our data. Even if they were trying to brute force the
+private key, it would take extremely long time
+
+
+a. It depends:
+If we did not enable the key-based authentication, the
+other team could use our password to decrypt and log in to our server.
+However, if we disabled password features, the other team did not have
+the private key to decrypt our data and could not log in to our server.
+
+b.Insecured:
+If the other team had our USB drive and inside that contained our private key,
+then the other team could use the private key to decrypt the data and log into our server.
+Unless we put our private key inside a folder and set it a password, this
+is very insecure case
+
+2. gpg --verify did not verify that who
+personally created the tar file. For example, assume that
+some hacker wanted to ear drop the communication between user1 
+and user2. The user1 used hash function and then encrypted 
+the data and sent that package (lets call package 1) to the user2. 
+The hacker would catch the package1, manipulated the data,signed the data, 
+replaced user1's public key with the hacker's public key. 
+user2 received the package, ran gpg --verify and it said matched but did not know
+that the public key and signature had been changed.
+
+To fix this problem, we can let another trusted 3rd party to track
+who is the original person created and sent the data. By this, we will have 
+more secure network
